@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	<main>
+		<div class="container">
+
+			<section class="details">
+				<h1>{{play.title}}</h1>
+				<div>
+					<img src={{ play.imageUrl|e('html_attr') }}>
+				</div>
+			</section>
+
+			<section class="details">
+				<h3>Theater Description</h3>
+				<p>{{play.description}}</p>
+				<p>{{play.createdAt|date}}</p>
+				<div class="buttons">
+					<a class="btn delete" href={{path("delete_unit", {id: play.id} )}}>Delete</a>
+					<a class="btn edit" href={{path("edit_unit", {id: play.id} )}}>Edit</a>
+					{% if isLiked %}
+						<span class="liked">You have already liked this play!</span>
+					{% endif %}
+					<a class="btn like" href="">Like</a>
+				</div>
+			</section>
+		</div>
+	</main>
+{% endblock %}
