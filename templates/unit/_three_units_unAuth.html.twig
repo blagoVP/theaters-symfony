@@ -1,0 +1,19 @@
+{% if plays|length>0 %}
+	{% for play in plays %}
+    	<div>
+			<div class="home-image">
+				<img src={{play.imageUrl}} alt="Card image cap" width="400">
+			</div>
+			<div class="info">
+				<h4>{{play.title}}</h4>
+			</div>
+		</div>
+	{% endfor %}
+{% else %}
+	<h4>No plays yet...</h4>
+{% endif %}
+
+
+	
+
+	

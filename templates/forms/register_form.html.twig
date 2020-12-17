@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <form action="/" method="post">
+        <h2>Register</h2>
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" placeholder="Username" value="" name="user[username]">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" placeholder="Password" value="user[password]">
+        </div>
+            {# {{form_row(form._token)}} #}
+        <button class="btn" type="submit" name="user[submit]">Login</button>
+    </form>
+{% endblock %}
