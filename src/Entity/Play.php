@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\PlayRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,6 +39,8 @@ class Play
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="likedPlays")
+     *
+     * @var ArrayCollection|User[]
      */
     private $usersLiked;
 
@@ -47,6 +49,12 @@ class Play
      * @ORM\JoinColumn(nullable=false)
      */
     private $creator;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        // $this->usersLiked = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,7 +114,7 @@ class Play
         return $this->usersLiked;
     }
 
-    public function setUsersLiked(?User $usersLiked): self
+    public function setUsersLiked($usersLiked): self
     {
         $this->usersLiked = $usersLiked;
 
