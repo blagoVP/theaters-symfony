@@ -11,4 +11,6 @@ interface FetchUnitInterface
     public function deleteUnit($id);
 
     public function createPlay($play);
+
+    public function editPlay();
 }

@@ -78,11 +78,22 @@ class UnitController extends AbstractController
     /**
      * @Route("/edit/{id<\d+>}", name="edit_unit")
      */
-    public function editUnit(string $id)
+    public function editUnit(string $id, Request $request)
     {
-        return new Response(
-            "<html><body><h1>Edit page with id={$id}</h1></body></html>"
-        );
+        $play = $this->unitService->getOneUnit($id);
+        $form = $this->createForm(PlayType::class, $play);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $play = $form->getData();
+            $this->unitService->editPlay();
+
+            return $this->redirectToRoute('details_page', ['id' => $id]);
+        }
+
+        return $this->render('forms/edit_play_form.html.twig', [
+            'form' => $this->createForm(PlayType::class)->createView(),
+            'play' => $play, ]);
     }
 
     /**

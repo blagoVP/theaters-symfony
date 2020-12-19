@@ -8,7 +8,7 @@
                 <h4>{{play.title}}</h4>
                     <div class="info-buttons">
                         <a class="btn details" href={{path("details_page", {id: play.id})}}>Details</a>
-                            <span class="likes">5 likes</span>
+                            <span class="likes">{{play.usersLiked|length}} likes</span>
                     </div>
             </div>
         </div>                   

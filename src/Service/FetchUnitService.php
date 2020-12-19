@@ -39,4 +39,9 @@ class FetchUnitService implements FetchUnitInterface
         $this->entityManager->persist($play);
         $this->entityManager->flush();
     }
+
+    public function editPlay()
+    {
+        $this->entityManager->flush();
+    }
 }
