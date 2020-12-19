@@ -9,4 +9,6 @@ interface FetchUnitInterface
     public function getAllUnits();
 
     public function deleteUnit($id);
+
+    public function createPlay($play);
 }

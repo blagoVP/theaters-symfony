@@ -4,13 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Play;
 use App\Form\Type\PlayType;
+use App\Repository\UserRepository;
 use App\Service\FetchUnitInterface;
-use App\Service\FetchUserInterface;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/unit")
@@ -29,26 +28,21 @@ class UnitController extends AbstractController
      *
      * @return Response
      */
-    public function createUnit(FetchUserInterface $fetchUserService, ValidatorInterface $validator)
+    public function createUnit(Request $request, UserRepository $userRepository)
     {
-        // $user = $fetchUserService->getOneById(3);
+        $play = new Play();
 
-        // $entityManager = $this->getDoctrine()->getManager();
+        $form = $this->createForm(PlayType::class, $play);
 
-        // $play = new Play();
-        // $play->setCreatedAt(new DateTime());
-        // $play->setCreator($user);
-        // $play->setTitle('Man City ot user 1Cloud 9 by Caryl Churchill');
-        // $play->setDescription('fajlfhaeflihsoihsondhcvnsdvhys');
-        // $play->setImageUrl('https://media.timeout.com/images/103727773/380/285/image.jpg');
+        $form->handleRequest($request);
 
-        // $errors = $validator->validate($play);
-        // if (count($errors) > 0) {
-        //     return new Response((string) $errors);
-        // }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $play = $form->getData();
+            $play->setCreator($userRepository->find(1));
+            $this->unitService->createPlay($play);
 
-        // $entityManager->persist($play);
-        // $entityManager->flush();
+            return $this->redirectToRoute('home_auth');
+        }
 
         return $this->render('forms/play_form.html.twig', ['form' => $this->createForm(PlayType::class)->createView()]);
     }
