@@ -15,10 +15,30 @@ class PlayType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $optins)
     {
         $builder
-            ->add('title', TextType::class)
-            ->add('imageUrl', TextType::class)
-            ->add('description', TextareaType::class)
-            ->add('submit', SubmitType::class)
+            ->add('title', TextType::class, [
+                'label' => 'Theater Title:',
+                'attr' => [
+                    'maxlength' => 50,
+                    'minlength' => 2,
+                ],
+            ])
+            ->add('imageUrl', TextType::class, [
+                'label' => 'Image url:',
+                'required' => false,
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Theater Description:',
+                'attr' => [
+                    'maxlength' => 255,
+                    'minlength' => 23,
+                ],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Submit theater:',
+                'attr' => [
+                    'class' => 'btn',
+                ],
+            ])
         ;
     }
 

@@ -6,23 +6,20 @@ use App\Entity\User;
 use App\Form\Type\UserType;
 use App\Service\FetchUserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/user")
  */
 class UserController extends AbstractController
 {
-    /**
-     * @Route("/login", name="login")
-     *
-     * @return Response
-     */
-    public function login()
+    private $userService;
+
+    public function __construct(FetchUserInterface $fetchUserService)
     {
-        return $this->render('forms/login_form.html.twig', ['form' => $this->createForm(UserType::class)->createView()]);
+        $this->userService = $fetchUserService;
     }
 
     /**
@@ -30,59 +27,20 @@ class UserController extends AbstractController
      *
      * @return Response
      */
-    public function register()
+    public function register(Request $request)
     {
-        return $this->render('forms/register_form.html.twig', ['form' => $this->createForm(UserType::class)->createView()]);
-    }
-
-    /**
-     * @Route("/test", name="test")
-     *
-     * @return Response
-     */
-    public function testRegister(ValidatorInterface $validator)
-    {
-        $entityManager = $this->getDoctrine()->getManager();
-
         $user = new User();
-        $user->setUsername('test user2');
-        $user->setPassword('passsss');
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
 
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-            return new Response((string) $errors);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // $user = $form->getData();
+            $user->setRoles(['ROLE_USER']);
+            $this->userService->registerUser($user);
+
+            return $this->redirectToRoute('home_auth');
         }
 
-        $entityManager->persist($user);
-
-        $entityManager->flush();
-
-        return new Response(
-            '<html><body><h1>Database persisted</h1></body></html>'
-        );
-    }
-
-    /**
-     * @Route("/getuser/{id}")
-     *
-     * @param mixed $id
-     *
-     * @return Response
-     */
-    public function getTestUesr($id, FetchUserInterface $fetchUser)
-    {
-        $user = $fetchUser->getOneById($id)->getUsername();
-
-        return new Response($user);
-    }
-
-    /**
-     * @Route("/logout", name="logout")
-     */
-    public function logout()
-    {
-        return new Response(
-            '<html><body><h1>Logout</h1></body></html>'
-        );
+        return $this->render('forms/register_form.html.twig', ['form' => $this->createForm(UserType::class)->createView()]);
     }
 }

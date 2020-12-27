@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Play;
 use App\Form\Type\PlayType;
-use App\Repository\UserRepository;
 use App\Service\FetchUnitInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,17 +27,17 @@ class UnitController extends AbstractController
      *
      * @return Response
      */
-    public function createUnit(Request $request, UserRepository $userRepository)
+    public function createUnit(Request $request)
     {
         $play = new Play();
 
         $form = $this->createForm(PlayType::class, $play);
 
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $play = $form->getData();
-            $play->setCreator($userRepository->find(1));
+            $play->setCreator(($this->getUser()));
+
             $this->unitService->createPlay($play);
 
             return $this->redirectToRoute('home_auth');
@@ -94,6 +93,11 @@ class UnitController extends AbstractController
         return $this->render('forms/edit_play_form.html.twig', [
             'form' => $this->createForm(PlayType::class)->createView(),
             'play' => $play, ]);
+    }
+
+    public function likeUnit($id)
+    {
+        // code...
     }
 
     /**

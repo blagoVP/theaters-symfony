@@ -1,22 +1,22 @@
 {% extends "base.html.twig" %}
 {% block content %}
-
-    <form class="theater-form" action="" method="post">
+<div class="theater-form">
+    {{form_start(form)}}
         <h1>Create Theater</h1>
-        <div>
-            <label for="title">Theater Title:</label>
-            <input type="text" placeholder="Theater name" name="play[title]">
+        <div class="form-error">
+            {{ form_errors(form) }}
         </div>
         <div>
-            <label for="description">Theater Description:</label>
-            <textarea placeholder="Description" name="play[description]"></textarea>
+            {{form_row(form.title)}}
         </div>
         <div>
-            <label for="imageUrl">Image url:</label>
-            <input type="text" placeholder="Image Url" name="play[imageUrl]">
+            {{form_row(form.description)}}
         </div>
-            {# {{form_row(form._token)}} #}
-        <button class="btn" type="submit" name="play[submit]">Submit</button>       
-    </form>    
-                 
+        <div>
+            {{form_row(form.imageUrl)}}
+        </div>
+        {# {{form_row(form._token)}}  #}
+        {{form_row(form.submit)}}
+    {{form_end(form)}}
+</div>
 {% endblock %}

@@ -2,17 +2,14 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity("username")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -22,46 +19,41 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @Assert\NotBlank()
-     * @Assert\Length(
-     *          min = 3,
-     *          max = 20,
-     *          minMessage = "Your username must be at least {{ limit }} characters long",
-     *          maxMessage = "Your username cannot be longer than {{ limit }} characters"
-     * )
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string", length=250)
      */
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity=Play::class, mappedBy="usersLiked")
+     * A non-persisted field that's used to create the encoded password.
+     *
+     * @var string
      */
-    private $likedPlays;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Play::class, mappedBy="creator", orphanRemoval=true)
-     */
-    private $plays;
-
-    public function __construct()
-    {
-        $this->plays = new ArrayCollection();
-        $this->likedPlays = new ArrayCollection();
-    }
+    private $plainPassword;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
     {
-        return $this->username;
+        return (string) $this->username;
     }
 
     public function setUsername(string $username): self
@@ -71,9 +63,31 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return $this->password;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return (string) $this->password;
     }
 
     public function setPassword(string $password): self
@@ -84,62 +98,43 @@ class User
     }
 
     /**
-     * @return Collection|Play[]
+     * @see UserInterface
      */
-    public function getLikedPlays(): Collection
+    public function getSalt()
     {
-        return $this->likedPlays;
-    }
-
-    public function addLikedPlay(Play $likedPlay): self
-    {
-        if (!$this->likedPlays->contains($likedPlay)) {
-            $this->likedPlays[] = $likedPlay;
-            $likedPlay->setUsersLiked($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLikedPlay(Play $likedPlay): self
-    {
-        if ($this->likedPlays->removeElement($likedPlay)) {
-            // set the owning side to null (unless already changed)
-            if ($likedPlay->getUsersLiked() === $this) {
-                $likedPlay->setUsersLiked(null);
-            }
-        }
-
-        return $this;
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
     /**
-     * @return Collection|Play[]
+     * @see UserInterface
      */
-    public function getPlays(): Collection
+    public function eraseCredentials()
     {
-        return $this->plays;
+        // If you store any temporary, sensitive data on the user, clear it here
+        $this->plainPassword = null;
     }
 
-    public function addPlay(Play $play): self
+    /**
+     * Get a non-persisted field that's used to create the encoded password.
+     *
+     * @return string
+     */
+    public function getPlainPassword()
     {
-        if (!$this->plays->contains($play)) {
-            $this->plays[] = $play;
-            $play->setCreator($this);
-        }
-
-        return $this;
+        return $this->plainPassword;
     }
 
-    public function removePlay(Play $play): self
+    /**
+     * Set a non-persisted field that's used to create the encoded password.
+     *
+     * @param string $plainPassword a non-persisted field that's used to create the encoded password
+     *
+     * @return self
+     */
+    public function setPlainPassword(string $plainPassword)
     {
-        if ($this->plays->removeElement($play)) {
-            // set the owning side to null (unless already changed)
-            if ($play->getCreator() === $this) {
-                $play->setCreator(null);
-            }
-        }
+        $this->plainPassword = $plainPassword;
 
-        return $this;
+        $this->password = null;
     }
 }
