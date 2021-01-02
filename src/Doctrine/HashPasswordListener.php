@@ -34,4 +34,16 @@ class HashPasswordListener implements EventSubscriber
         );
         $entity->setPassword($encoded);
     }
+
+    public function preUpdate(LifecycleEventArgs $args)
+    {
+        $entity = $args->getEntity();
+        if (!$entity instanceof User) {
+            return;
+        }
+
+        $em = $args->getEntityManager();
+        $meta = $em->getClassMetadata(get_class($entity));
+        $em->getUnitOfWork()->recomputeSingleEntityChangeSet($meta, $entity);
+    }
 }

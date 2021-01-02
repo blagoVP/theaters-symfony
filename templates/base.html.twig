@@ -7,13 +7,12 @@
 			{% endblock %}
 		</title>
 		{% block stylesheets %}
-			{# {{ parent() }} #}
+			{# {{ parent() is calling arrent includes}} #}
 			<link href="{{ asset('site.css') }}" rel="stylesheet">
 			<link href="{{ asset('responsive.css') }}" rel="stylesheet">
 			<link href="{{ asset('homePage.css') }}" rel="stylesheet">
 			<link href="{{ asset('details.css') }}" rel="stylesheet">
 			<link href="{{ asset('style.css') }}" rel="stylesheet">
-			<link href="{{ asset('create-theater.css') }}" rel="stylesheet">
 		{% endblock %}
 	</head>
 	<body>
@@ -21,11 +20,18 @@
 			{% block header %}
 				<nav>
 					<a href={{path("home_auth")}}>Theater</a>
+					{% if app.user %}
+						<a href={{path("home_auth")}}>Welcome: {{app.user.username}}</a>
+					{% endif %}
 					<ul>
-						<li><a href={{path('home')}}>Home</a></li>
-						<li><a href={{path('app_logout')}}>Logout</a></li>
+						<li><a href={{path('home_auth')}}>Home</a></li>
+						{% if app.user %}
+						<li><a href={{path('app_logout')}}>Logout</a></li>	
+						{% else %}
 						<li><a href={{path('app_login')}}>Login</a></li>
-						<li><a href={{path('register')}}>Register</a></li>
+						<li><a href={{path('register')}}>Register</a></li>	
+						{% endif %}
+						{# https://symfonycasts.com/screencast/symfony-security/dynamic-roles#play #}
 					</ul>
 				</nav>
 			{% endblock %}

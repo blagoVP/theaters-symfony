@@ -15,12 +15,17 @@
 				<p>{{play.description}}</p>
 				<p>{{play.createdAt|date}}</p>
 				<div class="buttons">
-					<a class="btn delete" href={{path("delete_unit", {id: play.id} )}}>Delete</a>
-					<a class="btn edit" href={{path("edit_unit", {id: play.id} )}}>Edit</a>
-					{% if isLiked %}
-						<span class="liked">You have already liked this play!</span>
+					{% if app.user == play.creator %}
+						<a class="btn delete" href={{path("delete_unit", {id: play.id} )}}>Delete</a>
+						<a class="btn edit" href={{path("edit_unit", {id: play.id} )}}>Edit</a>
+					{% else %}
+						{% if isLiked %}
+							<span class="liked">You have already liked this play!</span>
+						{% else %}
+							<a class="btn like" href={{path("like_unit", {id: play.id} )}}>Like{{isLiked}}</a>
+						{% endif %}
 					{% endif %}
-					<a class="btn like" href="">Like</a>
+					
 				</div>
 			</section>
 		</div>
