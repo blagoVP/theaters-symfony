@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -40,6 +42,22 @@ class User implements UserInterface
      * @var string
      */
     private $plainPassword;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Play::class, mappedBy="creator", orphanRemoval=true)
+     */
+    private $plays;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Play::class, inversedBy="usersLiked")
+     */
+    private $likedPlays;
+
+    public function __construct()
+    {
+        $this->plays = new ArrayCollection();
+        $this->likedPlays = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -136,5 +154,59 @@ class User implements UserInterface
         $this->plainPassword = $plainPassword;
 
         $this->password = null;
+    }
+
+    /**
+     * @return Collection|Play[]
+     */
+    public function getPlays(): Collection
+    {
+        return $this->plays;
+    }
+
+    public function addPlay(Play $play): self
+    {
+        if (!$this->plays->contains($play)) {
+            $this->plays[] = $play;
+            $play->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlay(Play $play): self
+    {
+        if ($this->plays->removeElement($play)) {
+            // set the owning side to null (unless already changed)
+            if ($play->getCreator() === $this) {
+                $play->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Play[]
+     */
+    public function getLikedPlays(): Collection
+    {
+        return $this->likedPlays;
+    }
+
+    public function addLikedPlay(Play $likedPlay): self
+    {
+        if (!$this->likedPlays->contains($likedPlay)) {
+            $this->likedPlays[] = $likedPlay;
+        }
+
+        return $this;
+    }
+
+    public function removeLikedPlay(Play $likedPlay): self
+    {
+        $this->likedPlays->removeElement($likedPlay);
+
+        return $this;
     }
 }

@@ -34,7 +34,7 @@ class PlayType extends AbstractType
                 ],
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Submit theater:',
+                'label' => 'Submit theater',
                 'attr' => [
                     'class' => 'btn',
                 ],

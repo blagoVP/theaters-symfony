@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -38,22 +39,20 @@ class Play
     private $createdAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="likedPlays")
-     *
-     * @var ArrayCollection|User[]
-     */
-    private $usersLiked;
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="plays")
      * @ORM\JoinColumn(nullable=false)
      */
     private $creator;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="likedPlays")
+     */
+    private $usersLiked;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-        // $this->usersLiked = new ArrayCollection();
+        $this->usersLiked = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,18 +108,6 @@ class Play
         return $this;
     }
 
-    public function getUsersLiked(): ?User
-    {
-        return $this->usersLiked;
-    }
-
-    public function setUsersLiked($usersLiked): self
-    {
-        $this->usersLiked = $usersLiked;
-
-        return $this;
-    }
-
     public function getCreator(): ?User
     {
         return $this->creator;
@@ -129,6 +116,33 @@ class Play
     public function setCreator(?User $creator): self
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsersLiked(): Collection
+    {
+        return $this->usersLiked;
+    }
+
+    public function addUsersLiked(User $usersLiked): self
+    {
+        if (!$this->usersLiked->contains($usersLiked)) {
+            $this->usersLiked[] = $usersLiked;
+            $usersLiked->addLikedPlay($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersLiked(User $usersLiked): self
+    {
+        if ($this->usersLiked->removeElement($usersLiked)) {
+            $usersLiked->removeLikedPlay($this);
+        }
 
         return $this;
     }

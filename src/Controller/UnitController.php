@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Play;
 use App\Form\Type\PlayType;
 use App\Service\FetchUnitInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/unit")
  */
-class UnitController extends AbstractController
+class UnitController extends BasicController
 {
     private $unitService;
 
@@ -37,8 +36,10 @@ class UnitController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $play = $form->getData();
             $play->setCreator(($this->getUser()));
+            $user = $this->getUser();
+            $user->addPlay($play);
 
-            $this->unitService->createPlay($play);
+            $this->unitService->createPlay($play, $user);
 
             return $this->redirectToRoute('home_auth');
         }
@@ -54,7 +55,18 @@ class UnitController extends AbstractController
     public function details(string $id)
     {
         $play = $this->unitService->getOneUnit($id);
+        $user = $this->getUser();
         $isLiked = false;
+
+        if (null !== $play->getUsersLiked()) {
+            foreach ($play->getUsersLiked() as $compare) {
+                if ($compare == $user) {
+                    $isLiked = true;
+
+                    break;
+                }
+            }
+        }
 
         return $this->render('unit/details_page.html.twig', [
             'play' => $play,
@@ -69,7 +81,9 @@ class UnitController extends AbstractController
      */
     public function deleteUnit(string $id)
     {
-        $this->unitService->deleteUnit($id);
+        if ($this->getUser() === $this->unitService->getOneUnit($id)->getCreator()) {
+            $this->unitService->deleteUnit($id);
+        }
 
         return $this->redirectToRoute('home_auth');
     }
@@ -83,7 +97,7 @@ class UnitController extends AbstractController
         $form = $this->createForm(PlayType::class, $play);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->getUser() == $play->getCreator()) {
             $play = $form->getData();
             $this->unitService->editPlay();
 
@@ -95,31 +109,21 @@ class UnitController extends AbstractController
             'play' => $play, ]);
     }
 
-    public function likeUnit($id)
-    {
-        // code...
-    }
-
     /**
-     * @Route("unit/all/{flag}", name="all_units")
+     * @Route("/like/{id<\d+>}", name="like_unit")
      *
-     * @param mixed $flag
+     * @param mixed $id
      *
      * @return Response
      */
-    public function getAllUnits($flag)
+    public function likeUnit($id)
     {
-        $plays = $this->unitService->getAllUnits();
-        if ('0' === $flag) {
-            $plays = array_slice($plays, 0, 3);
+        $user = $this->getUser();
+        $play = $this->unitService->getOneUnit($id);
+        $play->addUsersLiked($user);
 
-            return $this->render('unit/_three_units_unAuth.html.twig', [
-                'plays' => $plays,
-            ]);
-        }
+        $this->unitService->likePlay($play, $user);
 
-        return $this->render('unit/_units_auth.html.twig', [
-            'plays' => $plays,
-        ]);
+        return $this->redirectToRoute('details_page', ['id' => $id]);
     }
 }
