@@ -19,12 +19,12 @@
 		{% block body %}
 			{% block header %}
 				<nav>
-					<a href={{path("home_auth")}}>Theater</a>
+					<a href={{path("home")}}>Theater</a>
 					{% if app.user %}
-						<a href={{path("home_auth")}}>Welcome: {{app.user.username}}</a>
+						<a href="">Welcome: {{app.user.username}}</a>
 					{% endif %}
 					<ul>
-						<li><a href={{path('home_auth')}}>Home</a></li>
+						<li><a href={{path('home')}}>Home</a></li>
 						{% if app.user %}
 						<li><a href={{path('app_logout')}}>Logout</a></li>	
 						{% else %}

@@ -41,7 +41,7 @@ class UnitController extends BasicController
 
             $this->unitService->createPlay($play, $user);
 
-            return $this->redirectToRoute('home_auth');
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('forms/play_form.html.twig', ['form' => $this->createForm(PlayType::class)->createView()]);
@@ -85,7 +85,7 @@ class UnitController extends BasicController
             $this->unitService->deleteUnit($id);
         }
 
-        return $this->redirectToRoute('home_auth');
+        return $this->redirectToRoute('home');
     }
 
     /**

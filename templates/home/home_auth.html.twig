@@ -18,12 +18,12 @@
                     <h1>Available Plays</h1>
                     <div class="home-buttons">
                         <a class="btn create-play" href={{path("create_unit")}}>Create Theater</a>
-                        <a class="btn create-play" href="">Sort by Date</a>
-                        <a class="btn create-play" href="">Sort by Likes</a>
+                        <a class="btn create-play" href={{path("home_auth", {flag: 'sort_by_date'})}}>Sort by Date</a>
+                        <a class="btn create-play" href={{path("home_auth", {flag: 'sort_by_likes'})}}>Sort by Likes</a>
                     </div>
                 </div>
                 <div class="theaters-container">
-                {{render(path("all_units", {flag: {flag}}))}}
+                {{render(path("all_units", {flag: flag}))}}
                 </div>
             </section>
 
