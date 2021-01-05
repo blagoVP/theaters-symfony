@@ -38,7 +38,7 @@ class UserController extends AbstractController
             $user->setRoles(['ROLE_USER']);
             $this->userService->registerUser($user);
 
-            return $this->redirectToRoute('home_auth');
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('forms/register_form.html.twig', ['form' => $this->createForm(UserType::class)->createView()]);

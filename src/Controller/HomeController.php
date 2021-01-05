@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\FetchUnitInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,18 +15,25 @@ class HomeController extends BasicController
     /**
      * @Route("/", methods="GET", name="home")
      */
-    public function home(): Response
+    public function index(Request $request): Response
     {
-        return $this->render('home/home_unauth.html.twig', [
+        // dd($request->getPathInfo());
+        if (null == $this->getUser()) {
+            return $this->render('home/home_unauth.html.twig', [
+            ]);
+        }
+
+        return $this->redirectToRoute('home_auth', [
+            'flag' => 'default',
         ]);
     }
 
     /**
-     * @Route("home/{flag}", methods="GET", name="home_auth")
+     * @Route("/home/{flag}", methods="GET", name="home_auth")
      *
      * @param mixed $flag
      */
-    public function homeAuth($flag): Response
+    public function home($flag, Request $request): Response
     {
         return $this->render('home/home_auth.html.twig', [
             'flag' => $flag,
@@ -49,6 +57,24 @@ class HomeController extends BasicController
             return $this->render('unit/_three_units_unAuth.html.twig', [
                 'plays' => $plays,
             ]);
+        }
+
+        if ('sort_by_date' === $flag) {
+            uasort($plays, function ($a, $b) {
+                return strtotime($a->getCreatedAt()->format('Y-m-d H:i:s')) < strtotime($b->getCreatedAt()->format('Y-m-d H:i:s'));
+            });
+        }
+
+        if ('default' === $flag) {
+            uasort($plays, function ($a, $b) {
+                return strtotime($a->getCreatedAt()->format('Y-m-d H:i:s')) > strtotime($b->getCreatedAt()->format('Y-m-d H:i:s'));
+            });
+        }
+
+        if ('sort_by_likes' === $flag) {
+            uasort($plays, function ($a, $b) {
+                return count($a->getUsersLiked()) < count($b->getUsersLiked());
+            });
         }
 
         return $this->render('unit/_units_auth.html.twig', [

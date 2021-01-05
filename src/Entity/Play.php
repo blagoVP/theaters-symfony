@@ -19,7 +19,7 @@ class Play
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @ORM\Column(type="string", length=30)
      */
     private $title;
 
